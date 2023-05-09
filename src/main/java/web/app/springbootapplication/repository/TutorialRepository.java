@@ -33,4 +33,6 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Long> {
 
     @Query("SELECT t FROM Tutorial t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :title, '%')) AND t.published=:published")
     List<Tutorial> findByTitleContainingCaseInsensitiveAndPublished(String title,boolean published);
+
+
 }

@@ -8,13 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import web.app.springbootapplication.entity.Tutorial;
+import web.app.springbootapplication.exception.ResourceNotFoundException;
 import web.app.springbootapplication.repository.TutorialRepository;
 import web.app.springbootapplication.service.TutorialService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -28,7 +26,7 @@ public class TutorialController {
     @Autowired
     TutorialService tutorialService;
 
-    @GetMapping("/tutorials/0")
+    @GetMapping("/tutorials/paging/0")
     public ResponseEntity<List<Tutorial>> getAllTutorialsWithPageable(
             @RequestParam(defaultValue = "0") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
@@ -39,7 +37,7 @@ public class TutorialController {
         return new ResponseEntity<>(getAllTutorialsWithPageable, HttpStatus.OK);
     }
 
-    @GetMapping("/tutorials/1")
+    @GetMapping("/tutorials/paging/1")
     public ResponseEntity<List<Tutorial>> getAllTutorialsWithPageable1(
             @RequestParam(defaultValue = "1") Integer pageNo,
             @RequestParam(defaultValue = "5") Integer pageSize,
@@ -50,7 +48,7 @@ public class TutorialController {
         return new ResponseEntity<>(getAllTutorialsWithPageable, HttpStatus.OK);
     }
 
-    @GetMapping("/tutorials/paging/0")
+    @GetMapping("/tutorials/another/paging/0")
     public ResponseEntity<List<Tutorial>> getAllTutorialsWithPagination(@RequestParam(defaultValue = "0") Integer page,
                                                                         @RequestParam(defaultValue = "3") Integer size) {
 
@@ -208,5 +206,27 @@ public class TutorialController {
         }
 
         return new ResponseEntity<>(getTitleAndPublishedByParam, HttpStatus.OK);
+    }
+
+    @GetMapping("/tutorials/{id}")
+    public ResponseEntity<Tutorial> getTutorialById(@PathVariable("id") long id) {
+        Optional<Tutorial> tutorialData = tutorialRepository.findById(id);
+
+        if (tutorialData.isPresent()) {
+            return new ResponseEntity<>(tutorialData.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/tutorials/exception/{id}")
+    public ResponseEntity<Tutorial> getTutorialIdByExceptionHandler(@PathVariable Long id){
+
+        Tutorial getTutorialId = tutorialRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("We can't find this id: " + id));
+
+        return new ResponseEntity<>(getTutorialId,HttpStatus.OK);
+
+
     }
 }
