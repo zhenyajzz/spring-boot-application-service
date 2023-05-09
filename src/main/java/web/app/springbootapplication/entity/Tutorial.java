@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tutorials")
+@Table(name = "tutorials",indexes = {
+        @Index(columnList = "title"),
+        @Index(name = "multiIndex1", columnList = "title, description"),
+        @Index(name = "multiIndex2", columnList = "description, published")
+})
 @JsonIgnoreProperties({"hibernateLazyInitializer"})
 public class Tutorial {
 
