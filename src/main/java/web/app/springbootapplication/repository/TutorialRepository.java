@@ -28,4 +28,9 @@ public interface TutorialRepository extends JpaRepository<Tutorial, Long> {
     Page<Tutorial> findByPublished(boolean published, Pageable pageable);
 
     Page<Tutorial> findByTitleContaining(String title, Pageable pageable);
+
+    List<Tutorial> findByTitleContainingIgnoreCaseAndPublished(String title, boolean published);
+
+    @Query("SELECT t FROM Tutorial t WHERE LOWER(t.title) LIKE LOWER(CONCAT('%', :title, '%')) AND t.published=:published")
+    List<Tutorial> findByTitleContainingCaseInsensitiveAndPublished(String title,boolean published);
 }

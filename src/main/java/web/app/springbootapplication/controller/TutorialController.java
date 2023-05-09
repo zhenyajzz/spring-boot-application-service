@@ -39,6 +39,31 @@ public class TutorialController {
         return new ResponseEntity<>(getAllTutorialsWithPageable, HttpStatus.OK);
     }
 
+    @GetMapping("/tutorials/1")
+    public ResponseEntity<List<Tutorial>> getAllTutorialsWithPageable1(
+            @RequestParam(defaultValue = "1") Integer pageNo,
+            @RequestParam(defaultValue = "5") Integer pageSize,
+            @RequestParam(defaultValue = "id") String sortBy) {
+
+        List<Tutorial> getAllTutorialsWithPageable = tutorialService.getAllTutorials(pageNo, pageSize, sortBy);
+
+        return new ResponseEntity<>(getAllTutorialsWithPageable, HttpStatus.OK);
+    }
+
+    @GetMapping("/tutorials/paging/0")
+    public ResponseEntity<List<Tutorial>> getAllTutorialsWithPagination(@RequestParam(defaultValue = "0") Integer page,
+                                                                        @RequestParam(defaultValue = "3") Integer size) {
+
+        Pageable paging = PageRequest.of(page, size);
+        Page<Tutorial> pageTutorial = tutorialRepository.findAll(paging);
+
+        List<Tutorial> getTutorial = pageTutorial.getContent();
+
+        return new ResponseEntity<>(getTutorial, HttpStatus.OK);
+
+
+    }
+
     @GetMapping("/tutorials/published/page")
     public ResponseEntity<Map<String, Object>> findByPublished(
             @RequestParam(defaultValue = "0") Integer pageNo,
@@ -88,23 +113,11 @@ public class TutorialController {
             response.put("totalItems", pageTut.getTotalElements());
             response.put("totalPages", pageTut.getTotalPages());
 
-            return new ResponseEntity<>(response,HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(null,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping("/tutorials/1")
-    public ResponseEntity<List<Tutorial>> getAllTutorialsWithPageable1(
-            @RequestParam(defaultValue = "1") Integer pageNo,
-            @RequestParam(defaultValue = "5") Integer pageSize,
-            @RequestParam(defaultValue = "id") String sortBy) {
-
-        List<Tutorial> getAllTutorialsWithPageable = tutorialService.getAllTutorials(pageNo, pageSize, sortBy);
-
-        return new ResponseEntity<>(getAllTutorialsWithPageable, HttpStatus.OK);
-    }
-
 
     @GetMapping("/tutorials")
     public ResponseEntity<List<Tutorial>> getAllTutorials(@RequestParam(required = false) String title) {
@@ -168,5 +181,32 @@ public class TutorialController {
         }
 
         return new ResponseEntity<>(getTutorialByPublishedQuery, HttpStatus.OK);
+    }
+
+    @GetMapping("/tutorials/title/published")
+    public ResponseEntity<List<Tutorial>> getTitleAndPublishedByParam(@RequestParam String title,
+                                                                      @RequestParam boolean published) {
+
+        List<Tutorial> getTitleAndPublishedByParam = tutorialRepository.findByTitleContainingIgnoreCaseAndPublished(title, published);
+
+        if (getTitleAndPublishedByParam.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(getTitleAndPublishedByParam, HttpStatus.OK);
+    }
+
+
+    @GetMapping("/tutorials/title/published/query")
+    public ResponseEntity<List<Tutorial>> getTitleAndPublishedByParamQuery(@RequestParam String title,
+                                                                           @RequestParam boolean published) {
+
+        List<Tutorial> getTitleAndPublishedByParam = tutorialRepository.findByTitleContainingCaseInsensitiveAndPublished(title, published);
+
+        if (getTitleAndPublishedByParam.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<>(getTitleAndPublishedByParam, HttpStatus.OK);
     }
 }
